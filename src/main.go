@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"github.com/FaiyazMujawar/golang-todo-app/src/router"
+)
 
 func main() {
-	fmt.Println("Welcome")
+	r := router.Router()
+	log.Fatalln(r.Run(":3000"))
 }
