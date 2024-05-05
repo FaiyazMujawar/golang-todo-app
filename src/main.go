@@ -1,12 +1,10 @@
 package main
 
 import (
-	"log"
-
-	"github.com/FaiyazMujawar/golang-todo-app/src/router"
+	"github.com/FaiyazMujawar/golang-todo-app/src/loaders"
 )
 
 func main() {
-	r := router.Router()
-	log.Fatalln(r.Run(":3000"))
+	app := loaders.GetApp()
+	app.Run()
 }
