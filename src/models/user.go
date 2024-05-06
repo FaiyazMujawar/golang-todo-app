@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -9,12 +10,13 @@ import (
 )
 
 type User struct {
-	gorm.Model
-	ID        uuid.UUID `json:"_id" gorm:"type:uuid;default:gen_random_uuid()"`
+	ID        uuid.UUID `json:"_id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	Firstname string    `json:"firstname"`
 	Lastname  string    `json:"lastname"`
 	Email     string    `json:"email" gorm:"unique"`
 	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) error {

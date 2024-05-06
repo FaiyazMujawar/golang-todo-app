@@ -5,6 +5,7 @@ import (
 
 	"github.com/FaiyazMujawar/golang-todo-app/src/auth"
 	"github.com/FaiyazMujawar/golang-todo-app/src/middlewares"
+	"github.com/FaiyazMujawar/golang-todo-app/src/todos"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +22,8 @@ func Router() *gin.Engine {
 		ctx.String(200, "PROTECTED")
 	})
 
-	auth.AddAuthRoutes(router)
+	auth.AddAuthRouteHandlers(router)
+	todos.AddTodoRouteHandlers(router)
 
 	return router
 }
