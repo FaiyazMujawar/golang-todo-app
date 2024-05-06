@@ -8,7 +8,6 @@ import (
 
 	"github.com/FaiyazMujawar/golang-todo-app/src/initializers"
 	"github.com/FaiyazMujawar/golang-todo-app/src/models"
-	jwtService "github.com/FaiyazMujawar/golang-todo-app/src/services"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -61,7 +60,7 @@ func login(ctx *gin.Context) {
 		})
 		return
 	}
-	token, err := jwtService.SignToken(jwt.MapClaims{
+	token, err := SignToken(jwt.MapClaims{
 		"sub": user.ID,
 	})
 	if err != nil {
@@ -74,9 +73,4 @@ func login(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, gin.H{
 		"token": token,
 	})
-}
-
-func AddAuthRoutes(router *gin.Engine) {
-	router.POST("/auth/register", register)
-	router.POST("/auth/login", login)
 }

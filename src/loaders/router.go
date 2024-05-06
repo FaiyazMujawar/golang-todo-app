@@ -3,7 +3,7 @@ package loaders
 import (
 	"net/http"
 
-	auth "github.com/FaiyazMujawar/golang-todo-app/src/controllers"
+	"github.com/FaiyazMujawar/golang-todo-app/src/auth"
 	"github.com/FaiyazMujawar/golang-todo-app/src/middlewares"
 	"github.com/gin-gonic/gin"
 )

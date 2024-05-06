@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/FaiyazMujawar/golang-todo-app/src/auth"
 	"github.com/FaiyazMujawar/golang-todo-app/src/initializers"
 	"github.com/FaiyazMujawar/golang-todo-app/src/models"
-	jwtService "github.com/FaiyazMujawar/golang-todo-app/src/services"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -21,7 +21,7 @@ func ValidateToken(ctx *gin.Context) {
 		})
 		return
 	}
-	claims, err := jwtService.VerifyToken(token[7:])
+	claims, err := auth.VerifyToken(token[7:])
 	if err != nil {
 		ctx.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"message": err.Error(),
