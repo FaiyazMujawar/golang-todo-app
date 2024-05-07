@@ -3,31 +3,36 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 
+	"github.com/FaiyazMujawar/golang-todo-app/src/api/requests"
 	"github.com/FaiyazMujawar/golang-todo-app/src/initializers"
 	"github.com/FaiyazMujawar/golang-todo-app/src/models"
+	"github.com/FaiyazMujawar/golang-todo-app/src/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 func register(ctx *gin.Context) {
-	var user models.User
-	err := ctx.BindJSON(&user)
+	var request requests.RegisterUserRequest
+	err := ctx.BindJSON(&request)
 	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
-			"message": err,
+		errorMessages := utils.ToErrorMessages(err.(validator.ValidationErrors))
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid Data",
+			"errors":  errorMessages,
 		})
 		return
 	}
 
+	user := request.ToUser()
 	result := initializers.DB.Create(&user)
 
 	if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": fmt.Sprintf("Email %s already used", user.Email),
 		})
 		return
@@ -36,26 +41,30 @@ func register(ctx *gin.Context) {
 }
 
 func login(ctx *gin.Context) {
-	type LoginRequest struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
 
-	var loginRequest LoginRequest
-	ctx.BindJSON(&loginRequest)
+	var loginRequest requests.LoginRequest
+	err := ctx.ShouldBindJSON(&loginRequest)
+	if err != nil {
+		errorMessages := utils.ToErrorMessages(err.(validator.ValidationErrors))
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid Data",
+			"errors":  errorMessages,
+		})
+		return
+	}
 
 	var user models.User
 	result := initializers.DB.Where("email=?", loginRequest.Email).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "No user found",
 		})
 		return
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password))
 	if err != nil {
-		ctx.IndentedJSON(http.StatusBadRequest, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "Incorrect password",
 		})
 		return
@@ -64,8 +73,7 @@ func login(ctx *gin.Context) {
 		"sub": user.ID,
 	})
 	if err != nil {
-		log.Default().Println(err)
-		ctx.IndentedJSON(http.StatusInternalServerError, gin.H{
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Token signing failed",
 		})
 		return

@@ -4,12 +4,14 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"time"
 
+	"github.com/FaiyazMujawar/golang-todo-app/src/api/requests"
 	"github.com/FaiyazMujawar/golang-todo-app/src/auth"
 	"github.com/FaiyazMujawar/golang-todo-app/src/initializers"
 	"github.com/FaiyazMujawar/golang-todo-app/src/models"
+	"github.com/FaiyazMujawar/golang-todo-app/src/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -56,14 +58,16 @@ func getTodoById(ctx *gin.Context) {
 func createTodo(ctx *gin.Context) {
 	loggedInUser, _ := auth.GetLoggedInUser(ctx)
 
-	type CreateTodoRequest struct {
-		Title       string     `json:"title"`
-		Description *string    `json:"description,omitempty"`
-		Expiry      *time.Time `json:"expiry,omitempty"`
+	var request requests.CreateTodoRequest
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		errorMessages := utils.ToErrorMessages(err.(validator.ValidationErrors))
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid Data",
+			"errors":  errorMessages,
+		})
+		return
 	}
-
-	var request CreateTodoRequest
-	ctx.BindJSON(&request)
 
 	todo := models.Todo{
 		Title:       request.Title,
@@ -74,7 +78,6 @@ func createTodo(ctx *gin.Context) {
 	result := initializers.DB.Create(&todo)
 
 	if result.Error != nil {
-		log.Default().Println(result.Error)
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": result.Error.Error(),
 		})
