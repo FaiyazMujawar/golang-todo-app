@@ -5,6 +5,7 @@ import (
 
 	"github.com/FaiyazMujawar/golang-todo-app/src/auth"
 	"github.com/FaiyazMujawar/golang-todo-app/src/middlewares"
+	"github.com/FaiyazMujawar/golang-todo-app/src/notes"
 	"github.com/FaiyazMujawar/golang-todo-app/src/todos"
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +25,7 @@ func Router() *gin.Engine {
 
 	auth.AddAuthRouteHandlers(router)
 	todos.AddTodoRouteHandlers(router)
+	notes.AddNotesRouteHandlers(router)
 
 	return router
 }
