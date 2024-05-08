@@ -11,5 +11,6 @@ func AddNotesRouteHandlers(router *gin.Engine) {
 		notesRoutes.GET("/", getAllNotes)
 		notesRoutes.GET("/:id", getNoteById)
 		notesRoutes.POST("/", create)
+		notesRoutes.DELETE("/:id", deleteById)
 	}
 }

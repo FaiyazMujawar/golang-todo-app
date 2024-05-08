@@ -24,10 +24,8 @@ func toErrorMessage(err validator.FieldError) string {
 		message = "is required"
 	case "email":
 		message = "is not a valid email"
-	case "min":
-		message = fmt.Sprintf("should be min %s characters", err.Param())
-	case "max":
-		message = fmt.Sprintf("should be max %s characters", err.Param())
+	case "min", "max":
+		message = fmt.Sprintf("should be %s %s characters", err.Tag(), err.Param())
 	default:
 		message = err.Error()
 	}
