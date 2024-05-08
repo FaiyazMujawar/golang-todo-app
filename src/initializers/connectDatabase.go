@@ -3,8 +3,8 @@ package initializers
 import (
 	"fmt"
 	"log"
-	"os"
 
+	"github.com/FaiyazMujawar/golang-todo-app/src/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,8 +13,7 @@ var DB *gorm.DB
 
 func ConnectDatabase() {
 	var err error
-	dsn := os.Getenv("dsn")
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	DB, err = gorm.Open(postgres.Open(config.Dsn()), &gorm.Config{
 		TranslateError: true,
 	})
 
